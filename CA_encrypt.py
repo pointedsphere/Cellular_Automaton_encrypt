@@ -3,15 +3,23 @@ import sys
 import numpy as np
 
 
+
+def EXIT(msg):
+    """
+    Exit using sys and print the error msg
+    """
+    sys.exit("ERROR : "+str(msg))
+
+
 def padLeftZeros(toPad,Size):
     """
     Take an input sting toPad of maximum length Size and padd the array on the left with zeros
     such that the final array is of length Size
     """
     if len(toPad)>Size:
-        sys.exit("ERROR : Input string for left padding larger than desired output length.")
+        EXIT("Input string for left padding larger than desired output length.")
     if not isinstance(toPad, str):
-        sys.exit("ERROR : Input for padding with zeros must be a string.")
+        EXIT("Input for padding with zeros must be a string.")
     return ("0" * (Size-len(toPad))) + toPad
     
         
@@ -34,10 +42,14 @@ class CA:
         # The size of the neighbourhood
         self.k = k
         if not isinstance(k, int):
-            sys.exit("ERROR : CA neighbourhood k must be an integer.")
+            EXIT("CA neighbourhood k must be an integer.")
         if k<1:
-            sys.exit("ERROR : CA neighbourhood k must be at least 1.")
-            
+            EXIT("CA neighbourhood k must be at least 1.")
+
+        # Currently we can only use odd k, with neighbourhood centered on cell
+        if (self.k%2) == 0:
+            EXIT("Currently only implemented for odd k")
+
         # The number of possible arrangements of k-1 bits
         self.numkM1 = np.power(2,self.k-1)
 
@@ -52,6 +64,9 @@ class CA:
 
         # Final value of the CA
         self.end = None
+
+        # CA array size
+        self.CAS = None
         
         
     def setRandSeed(self):
@@ -59,7 +74,7 @@ class CA:
         Set the random seed from the class value (if set) else exit with error.
         """
         if self.randSeed is None:
-            sys.exit("ERROR : self.randSeed not set as class variable.")
+            EXIT("self.randSeed not set as class variable.")
         else:
             r.seed(self.randSeed)
         
@@ -77,7 +92,7 @@ class CA:
             # Start with just the left most bits, i.e. that we use to create a pair, one
             # ending in 1 the other in 0. But these must be distinct, so cant both result
             # in a 0 or 1
-            leftMostBits = padLeftZeros("{0:b}".format(b),2)
+            leftMostBits = padLeftZeros("{0:b}".format(b),self.k-1)
             # Use RNG to decide which is 1 and which is zero
             if r.randint(0,1) == 0:
                 self.rules[leftMostBits+"0"] = 0
@@ -87,6 +102,34 @@ class CA:
                 self.rules[leftMostBits+"1"] = 0
             
 
+    def singleCSstep(self):
+        """
+        Take a single CA step taking self.CAts as the state at timestep t_{i} and then
+        overwriting it with the state at time t_{i+1}
+        """
+
+        # Check that everything is set correctly
+        if self.CAts is None:
+            EXIT("CAts not set, so a step cannot be taken.")
+        if self.rules is None:
+            EXIT("rules not set, so a step cannot be taken.")
+            
+        # Loop over each cell, populating the tmp next cell
+        tmpArr = []
+        kOffset = (self.k-1)//2
+        for C in range(self.CAS):
+            # Populate the temp string with the central cell and the neighbourhood of k cells
+            tmpStr = ""
+            for S in range(C-kOffset,C+kOffset+1):
+                tmpStr += str(self.CAts[S%self.CAS])
+
+            # Append the resultant cell from the neighbourhood and the rules to a temp array
+            tmpArr.append(int(self.rules[tmpStr]))
+
+        # Now overwrite the working array with the current timestep
+        self.CAts = np.array(tmpArr)
+
+
     def setBinStartVec(self,startVec):
         """
         Initialise a starting vector for the CA as a binary array
@@ -94,20 +137,26 @@ class CA:
 
         # First make sure the array contains only ones and zeros
         if np.amax(startVec)>1:
-            sys.exit("Error : Staring vector should be binary, contains values > 1.")
+            EXIT("Staring vector should be binary, contains values > 1.")
         if np.amin(startVec)<0:
-            sys.exit("Error : Staring vector should be binary, contains values < 0.")
+            EXIT("Staring vector should be binary, contains values < 0.")
 
         # Check that each value in the array is an integer
         for i in range(len(startVec)):
             if not isinstance(startVec[i], int):
-                sys.exit("ERROR : Starting vector must be an integer array of only 1's and 0's.")
-            
+                EXIT("Starting vector must be an integer array of only 1's and 0's.")
+
+        # Check that the vector space is sufficiently large
+        if len(startVec)<self.k:
+            EXIT("Vector size must be at least that of neighbourhood size.")
+
         # If it only contains acceptable values then set the class array as a numpy array (for ease)
         self.start = np.array(startVec,dtype=int)
 
         # Also set the other arrays as the vector size will always remain the same
         self.CAts = np.array(startVec,dtype=int)
         self.end  = np.array(startVec,dtype=int)
+        self.CAS  = len(self.end)
+
 
         

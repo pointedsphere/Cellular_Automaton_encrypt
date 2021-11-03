@@ -130,6 +130,16 @@ class CA:
         self.CAts = np.array(tmpArr)
 
 
+    def CSsteps(self,numSteps):
+        """
+        Run the CA for a set number of timesteps and set the result as the final timestep
+        """
+        for i in range(numSteps):
+            self.singleCSstep()
+        self.end = self.CAts
+
+        
+
     def setBinStartVec(self,startVec):
         """
         Initialise a starting vector for the CA as a binary array

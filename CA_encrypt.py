@@ -68,6 +68,10 @@ class CA:
         # CA array size
         self.CAS = None
         
+        # The Zleft and Zright values for checking for reversible rulesets
+        self.Zleft  = None
+        self.Zright = None
+
         
     def setRandSeed(self):
         """
@@ -100,7 +104,10 @@ class CA:
             else:
                 self.rules[leftMostBits+"0"] = 1
                 self.rules[leftMostBits+"1"] = 0
-            
+
+        # We have constructed the rules with Zleft = 1
+        self.Zleft = 1.0
+                
 
     def singleCSstep(self):
         """

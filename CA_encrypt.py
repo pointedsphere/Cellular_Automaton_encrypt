@@ -107,7 +107,33 @@ class CA:
 
         # We have constructed the rules with Zleft = 1
         self.Zleft = 1.0
-                
+        # But we must calcualte the Cright value
+        self.Zright = self.calcZright()
+
+
+    def calcZright(self):
+        """
+        Calculate the Zright value from a full CA rule set
+        """
+
+        if self.rules is None:
+            EXIT("rules not set, so Z_right cannot be calcualted.")
+
+        totDistinct = 0
+        # Generate the right most k-1 bytes by converting the integers in [0,2^(k-1)-1]
+        for b in range(0,self.numkM1):
+            # Start with just the rigt most bits, i.e. that we use to create a pair
+            # Use all possible binary numbers to achieve this
+            rightMostBits = padLeftZeros("{0:b}".format(b),self.k-1)
+
+            # If each pair, i.e. the two rightMostBits padded with a 1 and a 0 result
+            # in a different value then add 1 to the running total of distinct
+            if self.rules["1"+rightMostBits] != self.rules["0"+rightMostBits]:
+                totDistinct += 2
+
+        # Now we can scale to find the final Zright value
+        return totDistinct/self.numk
+    
 
     def singleCSstep(self):
         """

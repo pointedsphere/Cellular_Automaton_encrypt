@@ -36,6 +36,9 @@ class CA:
         # Allow for the setting of a random seed
         self.randSeed = None
 
+        # Maximum chances to generate a valid rulest
+        self.ruleGenCutoff = 100
+        
         # An empty value to hold the CA rules (as a dict)
         self.rules = None
 
@@ -133,6 +136,23 @@ class CA:
 
         # Now we can scale to find the final Zright value
         return totDistinct/self.numk
+
+
+    def genRulesLeftReversible(self):
+        """
+        Generate a CA rule set such that Z_left=1 and Z_right>=0.5
+        """
+
+        for g in range(self.ruleGenCutoff):
+            self.genRulesLeft()
+            if self.Zright>=0.5:
+                return
+            # Change the seed if it has been set, otherwise we'll just repeatedly
+            # gen the same rule set
+            self.randSeed += 1024
+            self.setRandSeed()
+            
+        EXIT("failed to generate valid ruleset after "+str(self.ruleGenCutoff)+" tries.")
     
 
     def singleCSstep(self):

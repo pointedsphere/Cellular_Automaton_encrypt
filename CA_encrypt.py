@@ -410,4 +410,101 @@ class CA:
         self.CAS  = len(self.end)
 
 
-        
+S = 3
+
+K = 5
+
+# Import an image (black and white) and make binary black and white
+A = np.asarray(Image.open("circles.png"))
+A = np.array(A/255,dtype=int)
+Ashape = A.shape
+
+C = CA(k=K)
+
+R = r.randint(1,1000000)
+C.randSeed = R
+C.setRandSeed()
+
+C.genRulesLeftReversible()
+print("random seed:",C.randSeed)
+
+print("number of rules:",len(C.rules))
+print("Z_right:",C.Zright)
+
+# C.setBinStartVec([0,1,0,0,1,0,0,1,0,0,1,0,0,1,0,0,1,0,0,1,0])
+# print(C.start)
+# for i in range(20):
+#     C.singleCAstep()
+#     if i==19:
+#         print("\n\n")
+#     print(C.CAts)
+
+# print("-------------------------")
+# C.setBinStartVec([0,0,0,0,0,0,0,0,0,0,1])
+# C.CAsteps(20)
+# print(C.end)
+
+# print("\n\n")
+# for i in range(20):
+#     C.singleCAstepReverseL()
+#     if i==19:
+#         print("\n\n")
+#     print(C.CAts)
+
+def saveImage(fname,D1arr,outShape):
+    im = Image.fromarray(np.array(np.resize(D1arr,outShape)*255,dtype=np.uint8))
+    im.save(fname)
+    
+# Set initial `end point'
+C.setBinEndVec(A.flatten())
+
+# save end point
+saveImage("input.png",C.end,Ashape)
+
+# # Generate a `checkerboard' array to XOR with input
+# randArr = []
+# for i in range(len(C.end)):
+#     randArr.append(i%2)
+# randArr = np.array(randArr,dtype=int)
+
+randArr = np.random.randint(2,size=len(C.end))
+
+# Xor the noise array with the end array
+C.end = xorArrays(C.end,randArr)
+C.CAts = C.end
+
+# save end point
+saveImage("input_XORed.png",C.CAts,Ashape)
+
+print("Input length:", len(C.end))
+print("\nEND   ",C.end)
+print("")
+
+# Step backwards from end to encrypt saving each image
+for i in range(S):
+    t = time.time()
+    C.singleCAstepReverseL()
+    saveImage("enc"+str(i)+".png",C.CAts,Ashape)
+    print(i,C.CAts, time.time()-t)
+    
+print("\n\n")
+
+# Step forwards to decrypt, saving each as an image
+for i in range(S):
+    t = time.time()
+    C.singleCAstep()
+    print(i,C.CAts, time.time()-t)
+    saveImage("dec"+str(i)+".png",C.CAts,Ashape)
+
+print("\nEND   ",C.CAts)
+
+# Xor for the final result
+C.CAts = xorArrays(C.CAts,randArr)
+saveImage("output.png",C.CAts,Ashape)
+
+for i in range(len(A)):
+    if A.flatten()[i] != C.CAts[i]:
+        EXIT("Beginning and end do not match")
+print("Beginning and end match")
+
+

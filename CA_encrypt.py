@@ -21,13 +21,44 @@ def padLeftZeros(toPad,Size):
     if not isinstance(toPad, str):
         EXIT("Input for padding with zeros must be a string.")
     return ("0" * (Size-len(toPad))) + toPad
-    
-        
+
+
+def xorArrays(A1,A2):
+    """
+    XOR two arrays of equal length that we assume contain only binary values
+    """
+
+    # First make sure the arrays are of equal length
+    if len(A1) != len(A2):
+        EXIT("Arrays to XOR not of equal length")
+
+    # Then XOR the input arrays
+    XORed = []
+    for i in range(len(A1)):
+        if (A1[i]==1 or A1[i]==0) and (A2[i]==1 or A2[i]==0):
+            XORed.append(A1[i]^A2[i])
+        else:
+            EXIT("Arrays to XOR contain non-binary value")
+
+    return np.array(XORed,dtype=int)
+
 
 class CA:
 
     """
-    A class for generating and running (both forwards and backwards) reversible cellular automata.
+    A class for generating and running (both forwards and backwards) reversible cellular automata (CA).
+
+    The CA in question is a nieve type, where we start with a neighbourhood of size k, where k is odd.
+    We then update the cell at time t_i+1 from the neighbourhood at time t_i, centered on the cell
+    in question.
+
+    NOTABLE VARIABLES
+    =================
+
+    rules:
+        A dictionary containing the rules for the CA. The key is the k bits from time t_i and the
+        value is a 1 or zero corresponding to that neighbourhood.
+
     """
 
     

@@ -180,8 +180,9 @@ class CA:
                 return
             # Change the seed if it has been set, otherwise we'll just repeatedly
             # gen the same rule set
-            self.randSeed += 1024
-            self.setRandSeed()
+            if self.randSeed is not None:
+                self.randSeed += 1024
+                self.setRandSeed()
             
         EXIT("failed to generate valid ruleset after "+str(self.ruleGenCutoff)+" tries.")
     

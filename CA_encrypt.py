@@ -236,10 +236,10 @@ class CA:
         if np.amin(startVec)<0:
             EXIT("Staring vector should be binary, contains values < 0.")
 
-        # Check that each value in the array is an integer
-        for i in range(len(startVec)):
-            if not isinstance(startVec[i], int):
-                EXIT("Starting vector must be an integer array of only 1's and 0's.")
+        # # Check that each value in the array is an integer
+        # for i in range(len(startVec)):
+        #     if not isinstance(startVec[i], int):
+        #         EXIT("Starting vector must be an integer array of only 1's and 0's.")
 
         # Check that the vector space is sufficiently large
         if len(startVec)<self.k:
@@ -251,6 +251,35 @@ class CA:
         # Also set the other arrays as the vector size will always remain the same
         self.CAts = np.array(startVec,dtype=int)
         self.end  = np.array(startVec,dtype=int)
+        self.CAS  = len(self.end)
+
+
+    def setBinEndVec(self,endVec):
+        """
+        Initialise an ending vector for the CA as a binary array
+        """
+
+        # First make sure the array contains only ones and zeros
+        if np.amax(endVec)>1:
+            EXIT("Ending vector should be binary, contains values > 1.")
+        if np.amin(endVec)<0:
+            EXIT("Ending vector should be binary, contains values < 0.")
+
+        # # Check that each value in the array is an integer
+        # for i in range(len(endVec)):
+        #     if not isinstance(endVec[i], int):
+        #         EXIT("Ending vector must be an integer array of only 1's and 0's.")
+
+        # Check that the vector space is sufficiently large
+        if len(endVec)<self.k:
+            EXIT("Vector size must be at least that of neighbourhood size.")
+
+        # If it only contains acceptable values then set the class array as a numpy array (for ease)
+        self.start = np.array(endVec,dtype=int)
+
+        # Also set the other arrays as the vector size will always remain the same
+        self.CAts = np.array(endVec,dtype=int)
+        self.end  = np.array(endVec,dtype=int)
         self.CAS  = len(self.end)
 
 

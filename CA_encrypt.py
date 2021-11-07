@@ -2,7 +2,8 @@ import random as r
 import sys
 import numpy as np
 
-
+from PIL import Image
+import time
 
 def EXIT(msg):
     """
@@ -187,7 +188,7 @@ class CA:
         EXIT("failed to generate valid ruleset after "+str(self.ruleGenCutoff)+" tries.")
     
 
-    def singleCSstep(self):
+    def singleCAstep(self):
         """
         Take a single CA step taking self.CAts as the state at timestep t_{i} and then
         overwriting it with the state at time t_{i+1}
@@ -202,29 +203,155 @@ class CA:
         # Loop over each cell, populating the tmp next cell
         tmpArr = []
         kOffset = (self.k-1)//2
-        for C in range(self.CAS):
-            # Populate the temp string with the central cell and the neighbourhood of k cells
-            tmpStr = ""
-            for S in range(C-kOffset,C+kOffset+1):
-                tmpStr += str(self.CAts[S%self.CAS])
+        # Find the first k-1 cells of the first neighbourhood with a dummy first bit
+        # that will be removed on the first loop
+        tmpStr = "B"
+        for S in range(-kOffset,kOffset):
+            tmpStr += str(self.CAts[S])
 
+        for C in range(self.CAS):
+            # Append the final cell in the current neighbourhood to the full neighbourhood
+            tmpStr = tmpStr[1:] + str(self.CAts[(C+kOffset)%self.CAS])
+            
             # Append the resultant cell from the neighbourhood and the rules to a temp array
             tmpArr.append(int(self.rules[tmpStr]))
 
         # Now overwrite the working array with the current timestep
         self.CAts = np.array(tmpArr)
 
+        # # Loop over each cell, populating the tmp next cell
+        # tmpArr = []
+        # kOffset = (self.k-1)//2
+        # for C in range(self.CAS):
+        #     # Populate the temp string with the central cell and the neighbourhood of k cells
+        #     tmpStr = ""
+        #     for S in range(C-kOffset,C+kOffset+1):
+        #         tmpStr += str(self.CAts[S%self.CAS])
 
-    def CSsteps(self,numSteps):
+        #     # Append the resultant cell from the neighbourhood and the rules to a temp array
+        #     tmpArr.append(int(self.rules[tmpStr]))
+
+        # # Now overwrite the working array with the current timestep
+        # self.CAts = np.array(tmpArr)
+
+
+    def CAsteps(self,numSteps):
         """
         Run the CA for a set number of timesteps and set the result as the final timestep
         """
         for i in range(numSteps):
-            self.singleCSstep()
+            self.singleCAstep()
         self.end = self.CAts
 
-        
 
+    def singleCAstepReverseL(self):
+        """
+        Perform a step backwards in the CA using the current rules assuming Z_left=1.
+
+        We do this by starting from the central cell at the position (k-1)/2 from the end
+        of the array, i.e. at -((k-1)//2). We then guess the first k-1 cell values at time
+        t_i-1. We then use these k-1 values and the known resultant value to determin the
+        last bit in the neighbourhood.
+
+        We then step forwards from left to right, going over each cell at time t_i, moving
+        from -ve to +ve array indices until we reach element -1. We then have an overlap,
+        i.e. the first k-1 and last k-1 cell values should be identical.
+
+        If they are identical, then great, we have reversed the CA. If they are not then
+        start again and make a different guess for the first k-1 cell values.
+
+        EXAMPLE
+        =======
+
+        Let k=3 and the message to be of length N+1. Then the first known cell at time
+        t_i we look at is index 0. We do this by considering the neighbourhood about 0.
+        As shown below we guess the two G neighbourhood values at time t_i-1. We also
+        consider the value of the -1 index of cell values at time t_i. From this we can
+        calculate the value R in the nighbourhood t_i-1.
+        
+         G  G | R
+        -2 -1 | 0 1 2 ... N |  <- cells at time t_i, all known
+
+        We then step forwards and use the previous result (C) and consider the cell at time
+        t_i with index 0 to find the last value in the neighbourhood, shown as R below.
+
+         G  G | C R
+        -2 -1 | 0 1 2 ... N |  <- cells at time t_i, all known
+        
+        We keep going until we find all by calcualting the values in such a way shown below
+
+         G  G | C C C ...  C  C |
+        -2 -1 | 0 1 2 ... N-1 N |  <- cells at time t_i, all known
+
+        We then compare the two guess values G with the two values C for N-1 and N. They
+        should match if we have done everything correctly. If not, start again with a 
+        different guess.
+        """
+        
+        # Try for all the possible combinations of the first k-1 bits
+        for b in range(0,self.numkM1):
+            
+            # We have a temporary array to save the attempt at the previous timestep cells to
+            CAtmp = []
+
+            # Guess the first k-1 bits
+            prevBits = padLeftZeros("{0:b}".format(b),self.k-1)
+
+            # Add these to the CAtmp array
+            for l in range(self.k-1):
+                CAtmp.append(int(prevBits[l]))
+
+            # Run from the last k-1 cells from the current timestep over a periodic boundary
+            # to the last element of the current time step cells
+            # for c in range(-((self.k-1)//2),len(self.CAts)-((self.k-1)//2)):
+            for c in range(0,len(self.CAts)):
+                
+                # As we have a binary choice, we only need check if the result of appending the
+                # previous bits with a 1 gives the required cell value, otherwise the correct
+                # appended bit is a zero
+                if self.rules[prevBits+"1"]==self.CAts[c]:
+                    appendBit = "1"
+                else:
+                    appendBit = "0"
+
+                # Add the correct cell to the tmp array for the previous timestep
+                CAtmp.append(int(appendBit))
+
+                # Update the previous bits for the next step
+                prevBits = prevBits[1:] + appendBit
+                
+            # Now check that the periodicity condition is also satisfied
+            correctGuess = True
+            # print("\n--------------------------------------------------")
+            # print("len(CAtmp)", len(CAtmp), CAtmp)
+            # print("A ", CAtmp)
+            for c in range((self.k-1)//2):
+                # print(c," : ",CAtmp[c] , " , ",-(self.k-1)+c," : ",CAtmp[-(self.k-1)+c])
+                # print(c+(self.k-1)//2," : ",CAtmp[c+(self.k-1)//2] , " , ",\
+                #       -(self.k-1)//2+c," : ",CAtmp[-(self.k-1)//2+c])
+                # print("")
+                if (CAtmp[c] != CAtmp[-(self.k-1)+c]) \
+                   or (CAtmp[c+(self.k-1)//2] != CAtmp[-(self.k-1)//2+c]):
+                    correctGuess = False
+            if correctGuess == True:
+                self.CAts = np.array(CAtmp[(self.k-1)//2:len(CAtmp)-(self.k-1)//2],dtype=int)
+                return
+
+        # If ww have got this far something has gone wrong
+        EXIT("Cannot reverse CA step")
+
+
+    def CAstepsReverse(self,numSteps):
+        """
+        Run the CA backwardsfor a set number of timesteps and set the result as the final timestep
+        """
+        # Need to initially set the CAts from the end point
+        self.CAts = self.end
+        for i in range(numSteps):
+            self.singleCAstepReverseL()
+        self.start = self.CAts
+
+        
     def setBinStartVec(self,startVec):
         """
         Initialise a starting vector for the CA as a binary array

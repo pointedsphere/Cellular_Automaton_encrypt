@@ -126,6 +126,17 @@ class CA:
         A dictionary containing the rules for the CA. The key is the k bits from time t_i and the
         value is a 1 or zero corresponding to that neighbourhood.
 
+    start:
+        The array of cells at the initial timestep from which each forwards step is taken from.
+        The final array of cells if we take multiple steps backwards (from end).
+
+    end:
+        The array of cells that we start from if we are moving backwards in time with the CA.
+        Mutliple backwards steps are carried out from start to end.
+
+    CAts:
+        The working array of CA cells.
+
     """
 
     

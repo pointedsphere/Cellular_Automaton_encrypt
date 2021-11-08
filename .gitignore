@@ -133,3 +133,6 @@ dmypy.json
 
 # In/out images
 *.png
+
+# Key files
+key.shared

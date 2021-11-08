@@ -341,11 +341,6 @@ class CA:
         if np.amin(startVec)<0:
             EXIT("Staring vector should be binary, contains values < 0.")
 
-        # # Check that each value in the array is an integer
-        # for i in range(len(startVec)):
-        #     if not isinstance(startVec[i], int):
-        #         EXIT("Starting vector must be an integer array of only 1's and 0's.")
-
         # Check that the vector space is sufficiently large
         if len(startVec)<self.k:
             EXIT("Vector size must be at least that of neighbourhood size.")
@@ -369,11 +364,6 @@ class CA:
             EXIT("Ending vector should be binary, contains values > 1.")
         if np.amin(endVec)<0:
             EXIT("Ending vector should be binary, contains values < 0.")
-
-        # # Check that each value in the array is an integer
-        # for i in range(len(endVec)):
-        #     if not isinstance(endVec[i], int):
-        #         EXIT("Ending vector must be an integer array of only 1's and 0's.")
 
         # Check that the vector space is sufficiently large
         if len(endVec)<self.k:
@@ -409,7 +399,7 @@ class CA:
         # Save the data out
         keyHead = "k ::: " + str(self.k) + "\nR :::"
         np.savetxt(filename, np.array(outputArr,dtype=int), newline=" ", fmt="%s", header=keyHead)
-
+        
 
     def readRules(self,filename="key.shared"):
         """

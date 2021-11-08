@@ -63,7 +63,7 @@ class CA:
     """
 
     
-    def __init__(self,k):
+    def __init__(self,k=1):
 
         # Allow for the setting of a random seed
         self.randSeed = None
@@ -388,9 +388,67 @@ class CA:
         self.CAS  = len(self.end)
 
 
-S = 3
+    def saveRules(self,filename="key.shared"):
+        """
+        Save the ruleset by iterating through each pair of integers in [0,k-1] saving output for appending
+        0 then the output for appending 1.
+        """
 
-K = 5
+        if self.rules is None:
+            EXIT("No rules set, so nothing to save")
+
+        outputArr = []
+        for b in range(0,self.numkM1):
+            if self.rules[padLeftZeros("{0:b}".format(b),self.k-1)+"0"] == 0:
+                outputArr.append(0)
+                outputArr.append(1)
+            else:
+                outputArr.append(1)
+                outputArr.append(0)
+
+        # Save the data out
+        keyHead = "k ::: " + str(self.k) + "\nR :::"
+        np.savetxt(filename, np.array(outputArr,dtype=int), newline=" ", fmt="%s", header=keyHead)
+
+
+    def readRules(self,filename="key.shared"):
+        """
+        Read the ruleset by iterating through each pair of integers in [0,k-1] saving output for appending
+        0 then the output for appending 1.
+        """
+
+        # Read the data in from the output file
+        with open(filename,"r") as f:
+            inputK   = int(f.readline().split(" ")[-1])
+            inputArr = np.array(f.readline().split(" ")[3:])
+
+        # Set all the values related to k
+        self.numkM1 = np.power(2,self.k-1)
+        self.numk = self.numkM1 * 2
+
+        # Empty out all the VA vectors (just in case)
+        self.start = None
+        self.CAts = None
+        self.end = None
+        self.CAS = None
+        
+        # Then save the input ruleset to the class variable
+        self.rules = {}
+        i = 0
+        for b in range(0,self.numkM1):
+            self.rules[padLeftZeros("{0:b}".format(b),self.k-1)+"0"] = int(inputArr[i])
+            i+=1
+            self.rules[padLeftZeros("{0:b}".format(b),self.k-1)+"1"] = int(inputArr[i])
+            i+=1
+        
+        # We currently only use Zleft=1 rulesets, so set/calcualte both Z values
+        self.Zleft  = 1.0
+        self.Zright = self.calcZright()            
+        
+
+S = 2
+
+K = 7
 
 # Import an image (black and white) and make binary black and white
 A = np.asarray(Image.open("circles.png"))

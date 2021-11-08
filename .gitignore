@@ -132,7 +132,7 @@ dmypy.json
 .DS_Store
 
 # In/out images
-*.png
+/*.png
 
 # Key files
 key.shared

@@ -490,20 +490,27 @@ print("Z_right:",C.Zright)
 def saveImage(fname,D1arr,outShape):
     im = Image.fromarray(np.array(np.resize(D1arr,outShape)*255,dtype=np.uint8))
     im.save(fname)
-    
+
+def randArr(length):
+    seed = 1000
+    A = []
+    for i in range(length):
+        seed = ((1664525*seed+1013904223)%0b100000000000000000000000000000000)\
+            -0b10000000000000000000000000000000
+        if seed<0:
+            A.append(1)
+        else:
+            A.append(0)
+    return np.array(A,dtype=int)
+            
 # Set initial `end point'
 C.setBinEndVec(A.flatten())
 
 # save end point
 saveImage("input.png",C.end,Ashape)
 
-# # Generate a `checkerboard' array to XOR with input
-# randArr = []
-# for i in range(len(C.end)):
-#     randArr.append(i%2)
-# randArr = np.array(randArr,dtype=int)
-
-randArr = np.random.randint(2,size=len(C.end))
+# Generate a random array (currently for testing XOR)
+randArr = randArr(len(C.end))
 
 # Xor the noise array with the end array
 C.end = xorArrays(C.end,randArr)
@@ -525,21 +532,27 @@ for i in range(S):
     
 print("\n\n")
 
+# Now create a new class instance
+D = CA(k=K)
+C.saveRules()
+D.readRules()
+D.setBinStartVec(C.CAts)
+
 # Step forwards to decrypt, saving each as an image
 for i in range(S):
     t = time.time()
-    C.singleCAstep()
-    print(i,C.CAts, time.time()-t)
-    saveImage("dec"+str(i)+".png",C.CAts,Ashape)
+    D.singleCAstep()
+    print(i,D.CAts, time.time()-t)
+    saveImage("dec"+str(i)+".png",D.CAts,Ashape)
 
-print("\nEND   ",C.CAts)
+print("\nEND   ",D.CAts)
 
 # Xor for the final result
-C.CAts = xorArrays(C.CAts,randArr)
-saveImage("output.png",C.CAts,Ashape)
+D.CAts = xorArrays(D.CAts,randArr)
+saveImage("output.png",D.CAts,Ashape)
 
 for i in range(len(A)):
-    if A.flatten()[i] != C.CAts[i]:
+    if A.flatten()[i] != D.CAts[i]:
         EXIT("Beginning and end do not match")
 print("Beginning and end match")
 

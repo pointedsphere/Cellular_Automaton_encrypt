@@ -219,21 +219,6 @@ class CA:
         # Now overwrite the working array with the current timestep
         self.CAts = np.array(tmpArr)
 
-        # # Loop over each cell, populating the tmp next cell
-        # tmpArr = []
-        # kOffset = (self.k-1)//2
-        # for C in range(self.CAS):
-        #     # Populate the temp string with the central cell and the neighbourhood of k cells
-        #     tmpStr = ""
-        #     for S in range(C-kOffset,C+kOffset+1):
-        #         tmpStr += str(self.CAts[S%self.CAS])
-
-        #     # Append the resultant cell from the neighbourhood and the rules to a temp array
-        #     tmpArr.append(int(self.rules[tmpStr]))
-
-        # # Now overwrite the working array with the current timestep
-        # self.CAts = np.array(tmpArr)
-
 
     def CAsteps(self,numSteps):
         """
@@ -322,14 +307,7 @@ class CA:
                 
             # Now check that the periodicity condition is also satisfied
             correctGuess = True
-            # print("\n--------------------------------------------------")
-            # print("len(CAtmp)", len(CAtmp), CAtmp)
-            # print("A ", CAtmp)
             for c in range((self.k-1)//2):
-                # print(c," : ",CAtmp[c] , " , ",-(self.k-1)+c," : ",CAtmp[-(self.k-1)+c])
-                # print(c+(self.k-1)//2," : ",CAtmp[c+(self.k-1)//2] , " , ",\
-                #       -(self.k-1)//2+c," : ",CAtmp[-(self.k-1)//2+c])
-                # print("")
                 if (CAtmp[c] != CAtmp[-(self.k-1)+c]) \
                    or (CAtmp[c+(self.k-1)//2] != CAtmp[-(self.k-1)//2+c]):
                     correctGuess = False
@@ -337,7 +315,7 @@ class CA:
                 self.CAts = np.array(CAtmp[(self.k-1)//2:len(CAtmp)-(self.k-1)//2],dtype=int)
                 return
 
-        # If ww have got this far something has gone wrong
+        # If we have got this far something has gone wrong
         EXIT("Cannot reverse CA step")
 
 

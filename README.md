@@ -69,7 +69,31 @@ We start by setting `T=5` and `k=7` and randomly generate a rule set with `Z_lef
 
 ![Steps backwards using a CA with `k=1`](images/multiple_enc_no_noise.png)
 
-It is clear the encryption is not enough after these 5 steps to completely obscure all the information in input. Of particular note are the low entropy areas at the top and bottom of the image (where there were large blocks of `0`s) and the central point (where a similar pattern repeated over many lines).
+It is clear the encryption is 'not enough' after these 5 steps to completely obscure all the information in input. Of particular note are the low entropy areas at the top and bottom of the image (where there were large blocks of `0`s) and the central point (where a similar pattern repeated over many lines).
+
+One way to get around this is by stepping back by a much larger number of steps. However, the cost involved in the encryption stepping backwards is not trivial as such adding many more steps is far from ideal.
+
+
+
+## Adding a XOR to Increase Entropy
+
+One idea to increase the entropy is to XOR our input data with a pseudo random bit string. One method would be for Alice to publicly distribute this random bit string. Bob could then take the string and XOR it with the result of performing decryption to recover the encrypted message.
+
+It is hoped that this will lead to more entropy in the encrypted data regardless as to if blocks of data are repeated.
+
+As this random bit string is public it can be varied with each message in order to further obfuscate the key.
+
+### Method
+
+Instead of distributing a large bit string (of the same size as the encrypted data) we distribute a random seed. This is coupled with (for now) the 'Even Quicker and Dirtier Generator' for random numbers from [^5] (p275-276). To generate the a random number `R` we need an initial seed `S`, then for every random number we perform:
+
+```
+R = S * 1664525 + 1013904223 (mod 2^32)
+S = R
+```
+
+
+
 
 
 
@@ -83,4 +107,5 @@ It is clear the encryption is not enough after these 5 steps to completely obscu
 
 [^4]:Dascălu M. Cellular Automata and Randomization: A Structural Overview. In: López-Ruiz R, editor. From Natural to Artificial Intelligence - Algorithms and Applications [Internet]. Rijeka: IntechOpen; 2018. p. 165–83. Available from: https://www.intechopen.com/chapters/62760
 
+[^5]:``Numerical Recipes in Fortran 77, The Art of Scientific Computing, Vol 1'', Press W.H. and Teukolsky S.A. and Vetterling W.T. and Flannery B.P., 2nd ed, Cambridge University Press.
 

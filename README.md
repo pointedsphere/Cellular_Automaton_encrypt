@@ -92,6 +92,14 @@ R = S * 1664525 + 1013904223 (mod 2^32)
 S = R
 ```
 
+### Example of XORing
+
+If we take the same image input as earlier and just XOR with a bit string create with the random seed `3574541233091423` we get
+![Example of circle XORed](curcles_XORed_example.png)
+
+This, on first look, does seem more random, almost encrypted. However, if Alice were to just perform this step and ignore the CA, Eve (who's been listening in) also has access to the pseudo random bit string (or at least the seed used to generate it). This means Alice could easily just XOR with the random noise bit string and recover the original message.
+
+
 
 
 

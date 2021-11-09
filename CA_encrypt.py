@@ -558,7 +558,7 @@ class CA:
                 outputArr.append(0)
 
         # Save the data out
-        keyHead = "k ::: " + str(self.k) + "\nR :::"
+        keyHead = "k ::: " + str(self.k) + "\nT ::: " + str(self.numSteps) + "\nR :::"
         np.savetxt(filename, np.array(outputArr,dtype=int), newline=" ", fmt="%s", header=keyHead)
         
 
@@ -570,8 +570,9 @@ class CA:
 
         # Read the data in from the output file
         with open(filename,"r") as f:
-            inputK   = int(f.readline().split(" ")[-1])
-            inputArr = np.array(f.readline().split(" ")[3:])
+            self.k        = int(f.readline().split(" ")[-1])
+            self.numSteps = int(f.readline().split(" ")[-1])
+            inputArr      = np.array(f.readline().split(" ")[3:])
 
         # Set all the values related to k
         self.numkM1 = np.power(2,self.k-1)

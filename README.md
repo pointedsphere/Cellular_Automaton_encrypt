@@ -1,6 +1,8 @@
-# CA_encrypt
+# Cellular Automata Encryption
 
 An encryption method using Cellular Automata (CA) following the work of Wuensche in [^1]. This is constructed here for the purposes of better understanding Wuensche's proposed method of CA based encryption and to test the cryptographic strength of the algorithm.
+
+**Note:** This repo is under development as experiments with CA encryption continue. As such this documentation is currently an outline of thought process rather than detailed program documentation. The code itself is extensively commented and full documentation will follow after experimentation has finished and the code is in a more constant state.
 
 
 

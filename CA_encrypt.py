@@ -232,7 +232,7 @@ class CA:
         self.numSteps = T
 
 
-    def noiseSeed(self,S):
+    def setNoiseSeed(self,S):
         """
         Set the seed to be used for the generation of the random noise array.
 
@@ -558,7 +558,7 @@ class CA:
                 outputArr.append(0)
 
         # Save the data out
-        keyHead = "k ::: " + str(self.k) + "\nR :::"
+        keyHead = "k ::: " + str(self.k) + "\nT ::: " + str(self.numSteps) + "\nR :::"
         np.savetxt(filename, np.array(outputArr,dtype=int), newline=" ", fmt="%s", header=keyHead)
         
 
@@ -570,8 +570,9 @@ class CA:
 
         # Read the data in from the output file
         with open(filename,"r") as f:
-            inputK   = int(f.readline().split(" ")[-1])
-            inputArr = np.array(f.readline().split(" ")[3:])
+            self.k        = int(f.readline().split(" ")[-1])
+            self.numSteps = int(f.readline().split(" ")[-1])
+            inputArr      = np.array(f.readline().split(" ")[3:])
 
         # Set all the values related to k
         self.numkM1 = np.power(2,self.k-1)
@@ -597,9 +598,55 @@ class CA:
         self.Zright = self.calcZright()            
         
 
+    def XORstartArr(self):
+        """
+        XOR the start array with the current random seed for noise array
+        """
+
+        if self.start is None:
+            EXIT("Start array not set, so cannot XOR with noise")
+        if self.noiseSeed is None:
+            EXIT("Noise seed not set, so cannot XOR with noise")
+
+        # Initialise a random number generator class (with the `Even Quicker and Dirtier
+        # Generator' for now
+        R = randEQaDG(self.noiseSeed)
+
+        # Generate an array of random bits of the requisite length
+        R.EQaDGbA(len(self.start))
+        randBitsforXOR = R.randBitArr
+        
+        # And XOR the start array with this `random' array
+        self.start = xorArrays(self.start,randBitsforXOR)
+
+        
+    def XORendArr(self):
+        """
+        XOR the start array with the current random seed for noise array
+        """
+
+        if self.end is None:
+            EXIT("End array not set, so cannot XOR with noise")
+        if self.noiseSeed is None:
+            EXIT("Noise seed not set, so cannot XOR with noise")
+
+        # Initialise a random number generator class (with the `Even Quicker and Dirtier
+        # Generator' for now
+        R = randEQaDG(self.noiseSeed)
+
+        # Generate an array of random bits of the requisite length
+        R.EQaDGbA(len(self.end))
+        randBitsforXOR = R.randBitArr
+        
+        # And XOR the start array with this `random' array
+        self.end = xorArrays(self.end,randBitsforXOR)
+
+        
 S = 2
 
 K = 7
+
+NS = 3574541233091423
 
 # Import an image (black and white) and make binary black and white
 A = np.asarray(Image.open("circles.png"))
@@ -611,8 +658,10 @@ C = CA(k=K)
 R = r.randint(1,1000000)
 C.randSeed = R
 C.setRandSeed()
-
+C.setNoiseSeed(NS)
+C.setNumSteps(S)
 C.genRulesLeftReversible()
+
 print("random seed:",C.randSeed)
 
 print("number of rules:",len(C.rules))
@@ -628,21 +677,12 @@ C.setBinEndVec(A.flatten())
 # save end point
 saveImage("input.png",C.end,Ashape)
 
-# Generate a random array (currently for testing XOR)
-R = randEQaDG()
-R.EQaDGbA(len(C.end))
-randArr = R.randBitArr
-
-print(randArr)
-
-EXIT("yo")
-
-# Xor the noise array with the end array
-C.end = xorArrays(C.end,randArr)
+# And XOR this end point with a random array
+C.XORendArr()
 C.CAts = C.end
 
 # save end point
-saveImage("input_XORed.png",C.CAts,Ashape)
+saveImage("input_XORed.png",C.end,Ashape)
 
 print("Input length:", len(C.end))
 print("\nEND   ",C.end)
@@ -660,24 +700,26 @@ print("\n\n")
 # Now create a new class instance
 D = CA(k=K)
 C.saveRules()
+
+# Step forwards to decrypt
 D.readRules()
 D.setBinStartVec(C.CAts)
+D.CAsteps()
 
-# Step forwards to decrypt, saving each as an image
-for i in range(S):
-    t = time.time()
-    D.singleCAstep()
-    print(i,D.CAts, time.time()-t)
-    saveImage("dec"+str(i)+".png",D.CAts,Ashape)
+# And XOR with the same random array as the input was XORed with
+D.setNoiseSeed(NS)
+D.XORendArr()
 
-print("\nEND   ",D.CAts)
+saveImage("output.png",D.end,Ashape)
 
-# Xor for the final result
-D.CAts = xorArrays(D.CAts,randArr)
-saveImage("output.png",D.CAts,Ashape)
+print("\nEND   ",D.end)
+
+# # Xor for the final result
+# D.CAts = xorArrays(D.CAts,randArr)
+# saveImage("output.png",D.CAts,Ashape)
 
 for i in range(len(A)):
-    if A.flatten()[i] != D.CAts[i]:
+    if A.flatten()[i] != D.end[i]:
         EXIT("Beginning and end do not match")
 print("Beginning and end match")
 

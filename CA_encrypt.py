@@ -140,7 +140,7 @@ class CA:
     """
 
     
-    def __init__(self,k=1):
+    def __init__(self,k=None,numSteps=None,noiseSeed=None):
 
         # Allow for the setting of a random seed
         self.randSeed = None
@@ -153,15 +153,19 @@ class CA:
 
         # The size of the neighbourhood
         self.k = k
-        if not isinstance(k, int):
-            EXIT("CA neighbourhood k must be an integer.")
-        if k<1:
-            EXIT("CA neighbourhood k must be at least 1.")
+        if self.k is not None:
+            if not isinstance(k, int):
+                EXIT("CA neighbourhood k must be an integer.")
+            if k<1:
+                EXIT("CA neighbourhood k must be at least 1.")
 
-        # Currently we can only use odd k, with neighbourhood centered on cell
-        if (self.k%2) == 0:
-            EXIT("Currently only implemented for odd k")
+            # Currently we can only use odd k, with neighbourhood centered on cell
+            if (self.k%2) == 0:
+                EXIT("Currently only implemented for odd k")
 
+        # The number of steps to use for encryption/decryption
+        self.numSteps = numSteps
+            
         # The number of possible arrangements of k-1 bits
         self.numkM1 = np.power(2,self.k-1)
 
@@ -184,21 +188,69 @@ class CA:
         self.Zleft  = None
         self.Zright = None
 
+        # The seed to be used for the noise array to XOR with
+        self.noiseSeed = noiseSeed
+
         
     def setRandSeed(self):
         """
         Set the random seed from the class value (if set) else exit with error.
+
+        This seed will be used for generation of the ruleset.
         """
         if self.randSeed is None:
             EXIT("self.randSeed not set as class variable.")
         else:
             r.seed(self.randSeed)
-        
 
+
+    def setK(self,K):
+        """
+        Set the value of k, after performing basic error checks.
+        """
+
+        if not isinstance(K, int):
+            EXIT("input k for setK is not an integer.")
+        if K<1:
+            EXIT("input k for setK must be at least 1.")
+        if (K%2) == 0:
+            EXIT("input k for setK must be odd")
+
+        self.k = K
+
+
+    def setNumSteps(self,T):
+        """
+        Set the number of steps to use in encryption/decryption.
+        """
+        
+        if not isinstance(T, int):
+            EXIT("input T for setNumsteps is not an integer.")
+        if T<1:
+            EXIT("input T for setNumSteps must be at least 1.")
+
+        self.numSteps = T
+
+
+    def noiseSeed(self,S):
+        """
+        Set the seed to be used for the generation of the random noise array.
+
+        Note the noise seed is currently limited to a 32 bit unsigned integer.
+        """
+
+        if not isinstance(S, int):
+            EXIT("input S for noiseSeed is not an integer.")
+        
+        self.noiseSeed = S % 0b100000000000000000000000000000000
+            
+        
     def genRulesLeft(self):
         """
         Generate a dictionary of rules such that Z_left = 1,
-        i.e. a rule that we can reverse by moving from left to right
+
+        i.e. a rule that we can reverse by moving from left to right where all pairs of
+        k-1 leftmost bits result in distinct outputs.
         """
 
         # Initialise rules dictionary
@@ -225,7 +277,7 @@ class CA:
 
     def calcZright(self):
         """
-        Calculate the Zright value from a full CA rule set
+        Calculate the Zright value from a full CA rule set.
         """
 
         if self.rules is None:
@@ -297,10 +349,21 @@ class CA:
         self.CAts = np.array(tmpArr)
 
 
-    def CAsteps(self,numSteps):
+    def CAsteps(self,numSteps=None):
         """
         Run the CA for a set number of timesteps and set the result as the final timestep
         """
+
+        # Error checks
+        if self.k is None:
+            EXIT("k not set before calling CAsteps")
+        if self.rules is None:
+            EXIT("rules not set before calling CAsteps")
+
+        if numSteps is None:
+            numSteps = self.numSteps
+            
+        self.CAts = self.start
         for i in range(numSteps):
             self.singleCAstep()
         self.end = self.CAts
@@ -309,6 +372,9 @@ class CA:
     def singleCAstepReverseL(self):
         """
         Perform a step backwards in the CA using the current rules assuming Z_left=1.
+        
+        I.e. take a single CA step taking self.CAts as the state at timestep t_{i} and then
+        overwriting it with the state at time t_{i-1}
 
         We do this by starting from the central cell at the position (k-1)/2 from the end
         of the array, i.e. at -((k-1)//2). We then guess the first k-1 cell values at time
@@ -396,10 +462,24 @@ class CA:
         EXIT("Cannot reverse CA step")
 
 
-    def CAstepsReverse(self,numSteps):
+    def CAstepsReverse(self,numSteps=None):
         """
-        Run the CA backwardsfor a set number of timesteps and set the result as the final timestep
+        Run the CA backwardsfor a set number of timesteps and set the result as the final timestep.
+
+        The initial cell array to move backwards from is self.end, with self.CAts used as a work
+        array, eventually overwriting self.start with self.end evolved backwards by numSteps time steps.
+
         """
+
+        # Error checks
+        if self.k is None:
+            EXIT("k not set before calling CAstepsReverse")
+        if self.rules is None:
+            EXIT("rules not set before calling CAstepsReverse")
+
+        if numSteps is None:
+            numSteps = self.numSteps
+            
         # Need to initially set the CAts from the end point
         self.CAts = self.end
         for i in range(numSteps):
@@ -463,7 +543,11 @@ class CA:
 
         if self.rules is None:
             EXIT("No rules set, so nothing to save")
-
+        if self.k is None:
+            EXIT("k not set, so nothing to save")
+        if self.numSteps is None:
+            EXIT("Number of steps not set, so nothing to save")
+            
         outputArr = []
         for b in range(0,self.numkM1):
             if self.rules[padLeftZeros("{0:b}".format(b),self.k-1)+"0"] == 0:

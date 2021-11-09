@@ -598,9 +598,55 @@ class CA:
         self.Zright = self.calcZright()            
         
 
+    def XORstartArr(self):
+        """
+        XOR the start array with the current random seed for noise array
+        """
+
+        if self.start is None:
+            EXIT("Start array not set, so cannot XOR with noise")
+        if self.noiseSeed is None:
+            EXIT("Noise seed not set, so cannot XOR with noise")
+
+        # Initialise a random number generator class (with the `Even Quicker and Dirtier
+        # Generator' for now
+        R = randEQaDG(self.noiseSeed)
+
+        # Generate an array of random bits of the requisite length
+        R.EQaDGbA(len(self.start))
+        randBitsforXOR = R.randBitArr
+        
+        # And XOR the start array with this `random' array
+        self.start = xorArrays(self.start,randBitsforXOR)
+
+        
+    def XORendArr(self):
+        """
+        XOR the start array with the current random seed for noise array
+        """
+
+        if self.end is None:
+            EXIT("End array not set, so cannot XOR with noise")
+        if self.noiseSeed is None:
+            EXIT("Noise seed not set, so cannot XOR with noise")
+
+        # Initialise a random number generator class (with the `Even Quicker and Dirtier
+        # Generator' for now
+        R = randEQaDG(self.noiseSeed)
+
+        # Generate an array of random bits of the requisite length
+        R.EQaDGbA(len(self.end))
+        randBitsforXOR = R.randBitArr
+        
+        # And XOR the start array with this `random' array
+        self.end = xorArrays(self.end,randBitsforXOR)
+
+        
 S = 2
 
 K = 7
+
+NS = 3574541233091423
 
 # Import an image (black and white) and make binary black and white
 A = np.asarray(Image.open("circles.png"))

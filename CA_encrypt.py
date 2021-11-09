@@ -232,7 +232,7 @@ class CA:
         self.numSteps = T
 
 
-    def noiseSeed(self,S):
+    def setNoiseSeed(self,S):
         """
         Set the seed to be used for the generation of the random noise array.
 

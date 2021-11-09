@@ -94,6 +94,8 @@ R = S * 1664525 + 1013904223 (mod 2^32)
 S = R
 ```
 
+This allows both Alice and Bob, who have agreed on the 'Even Quicker and Dirtier Generator' [^5] (p275-276) to cheaply generate the same pseudo random bit string without the need to send large amounts of data.
+
 ### Example of XORing
 
 If we take the same image input as earlier and just XOR with a bit string create with the random seed `3574541233091423` we get

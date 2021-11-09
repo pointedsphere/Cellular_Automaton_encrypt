@@ -65,11 +65,11 @@ Alice then steps backwards from `D` by `T` steps using `R`. This data is the enc
 
 ### Example
 
-We start by setting `T=5` and `k=7` and randomly generate a rule set with `Z_left=1` and `Z_right>=0.5`. We then take our initial data (i.e. cells at time `j`) from a simple image, where each pixel of the image is either `0` (white) or `1` (black). Encrypting by evolving the CA backwards in time by 5 steps gives the results below, where each CA backwards step is shown (going from right to left):
+We start by setting `T=5` and `k=7` and randomly generate a rule set with `Z_left=1` and `Z_right>=0.5`. We then take our initial data (i.e. cells at time `j`) from a simple image, where each pixel of the image is either `0` (white) or `1` (black). Encrypting by evolving the CA backwards in time by 5 steps gives the results below, where each CA backwards step is shown (going from right to left with each step separated by a red line):
 
 ![Steps backwards using a CA with `k=1`](images/multiple_enc_no_noise.png)
 
-
+It is clear the encryption is not enough after these 5 steps to completely obscure all the information in input. Of particular note are the low entropy areas at the top and bottom of the image (where there were large blocks of `0`s) and the central point (where a similar pattern repeated over many lines).
 
 
 

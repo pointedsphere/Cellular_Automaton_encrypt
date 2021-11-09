@@ -4,6 +4,8 @@ An encryption method using Cellular Automata (CA) following the work of Wuensche
 
 **Note:** This repo is under development as experiments with CA encryption continue. As such this documentation is currently an outline of thought process rather than detailed program documentation. The code itself is extensively commented and full documentation will follow after experimentation has finished and the code is in a more constant state.
 
+**Note:** As the approach is currently under experimentation, and as such the code is in a state of flux, some routines are not optimised for reduction of computational cost.
+
 
 
 ## Some Initial Definitions/Methods

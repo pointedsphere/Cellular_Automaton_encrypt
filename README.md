@@ -67,15 +67,39 @@ Alice then steps backwards from `D` by `T` steps using `R`. This data is the enc
 
 
 
-### Example
+### Example (binary image)
 
-We start by setting `T=5` and `k=7` and randomly generate a rule set with `Z_left=1` and `Z_right>=0.5`. We then take our initial data (i.e. cells at time `j`) from a simple image, where each pixel of the image is either `0` (white) or `1` (black). Encrypting by evolving the CA backwards in time by 5 steps gives the results below, where each CA backwards step is shown (going from right to left with each step separated by a red line):
+We start by setting `T=5` and `k=7` and randomly generate a rule set with `Z_left=1` and `Z_right>=0.5`. We then take our initial data (i.e. cells at time `j`) from a simple image, where each pixel of the image is either `0` (white) or `1` (black) which we refer to as a 'binary image'. Encrypting by evolving the CA backwards in time by 5 steps gives the results below, where each CA backwards step is shown (going from right to left with each step separated by a red line):
 
-![Steps backwards using a CA with `k=1`](images/multiple_enc_no_noise.png)
+![Steps backwards using a CA with `k=7`](images/multiple_enc_no_noise.png)
 
 It is clear the encryption is 'not enough' after these 5 steps to completely obscure all the information in input. Of particular note are the low entropy areas at the top and bottom of the image (where there were large blocks of `0`s) and the central point (where a similar pattern repeated over many lines).
 
 One way to get around this is by stepping back by a much larger number of steps. However, the cost involved in the encryption stepping backwards is not trivial as such adding many more steps is far from ideal.
+
+
+
+### Example (greyscale image)
+
+To examine the problem in a more realistic scenario whilst monition the same help in visualising the evolution as in the previous subsection we turn to a greyscale image. This is done by converting the image into a 1D array by converting each pixel into 8 bits (i.e. integers in [0,255]). We then run this image through a randomly generated CA with parameters as in the previous section (`T=5`, `k=7`, `Z_left=1` and `Z_right>=0.5`). We also utilise the same starting image as in the previous subsection. This results in the below 'backwards evolution' over 5 time steps
+
+![Steps backwards using a CA with `k=7`](images/mult_enc_no_noise_greyscale.png)
+
+where above the 'backwards evolution' runs from the initial image on the left evolving backwards to the right (with each step separated by a red vertical line).
+
+We see from this experiment that the shadow of the original image is even more obvious than when we were using a binary image. This is as the repeated patterns (e.g. the whitespace at the top and bottom and the repeated pattern across the centre of the circles) will result in a final repeated pattern when ran through a CA.
+
+This further shows the need for the addition of some form of noise to the original step. One way to avoid this would be to add some form of noise to the original image (via a XOR operation). The structure of this noise will (hopefully) be lost in the backwards step in the CA further obfuscating the original message.
+
+
+
+### Example (less uniform greyscale image)
+
+We now turn to the exact same approach as above, but with less uniform initial data, in this case a picture of a clown. We see the backwards evolution over `T=5` steps with `k=7` below.
+
+![Clown picture steps backwards using a CA with `k=7`](images/mult_enc_no_noise_clown_greyscale.png)
+
+It seems from a cursory look that the initial image seems obfuscated by the 5 backwards steps, even by 1 backwards steps. Though we are starting from a higher entropy image, we must design the algorithm such that it obfuscates any image.
 
 
 

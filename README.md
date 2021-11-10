@@ -106,6 +106,8 @@ If we take the same image input as earlier and just XOR with a bit string create
 
 This, on first look, does seem more random, almost encrypted. However, let's assume Alice just performs this step and ignores the CA thinking it looks encrypted. She forgets that Eve (who's been listening in) also has access to the pseudo random bit string (or at least the seed used to generate it). This means Eve can easily just XOR with the random noise bit string and recover the original message.
 
+However, if we take the above XORed image as the starting point for `T` backwards CA steps this would negate the issues found earlier. I.e. this extra noise, even though the noise is not secret, will mask (for large enough `T`) underlying structures in the input data when combined with a CA.
+
 
 
 

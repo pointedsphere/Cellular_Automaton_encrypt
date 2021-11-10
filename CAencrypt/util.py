@@ -6,7 +6,7 @@ from PIL import Image
 
 def EXIT(msg):
     """
-    Exit using sys and print the error msg
+    Exit using sys and print the error msg.
     """
     sys.exit("ERROR : "+str(msg))
 
@@ -15,6 +15,20 @@ def padLeftZeros(toPad,Size):
     """
     Take an input sting toPad of maximum length Size and padd the array on the left with zeros
     such that the final array is of length Size
+
+    INPUTS
+    ======
+    toPad
+        A 1D integer array that will be padded with zeros. Must have a length less than or equal
+        to Size.
+    Size
+        The desired output size after padding.
+
+    RETURNS
+    =======
+    Padded array
+        The array toPad but with zeros appended on the left such that the output array is of 
+        length Size.
     """
     if len(toPad)>Size:
         EXIT("Input string for left padding larger than desired output length.")
@@ -26,6 +40,17 @@ def padLeftZeros(toPad,Size):
 def xorArrays(A1,A2):
     """
     XOR two arrays of equal length that we assume contain only binary values.
+
+    INPUTS
+    ======
+    A1, A2
+        The two arrays to XOR together. They must both be of the same length and only contain
+        binary values (as integers).
+
+    RETURNS
+    =======
+    XORed array
+        An array of binary values containing the result of XORing A1 and A2.
     """
 
     # First make sure the arrays are of equal length
@@ -55,6 +80,19 @@ def readBWImage2BinArr(filename):
     E.g. if the input is a 50 x 50 pixel black and white image will be converted into a 1D array
          of 2500 values in [0,255]. Each element is then converted into an array of 8 bits which
          results in an array of 20000 bits.
+
+    INPUTS
+    ======
+    filename
+        The filename of the image to read. The image must be greyscale.
+
+    RETURNS
+    =======
+    image array
+        A 1D binary array containing the image data. Each pixel is converted to an 8 bit binary integer.
+    
+    dims
+        The dimensions of the file that is read.
     """
 
     if not os.path.exists(filename):
@@ -83,6 +121,16 @@ def saveBinArr2BWImage(filename,binArr,dim):
     Each 8 bits of the binary array correspond to a pixel value in [0,255].
     This is then rearranged to the dimensions given in dim and then saved to
     the output filename.
+
+    INPUTS
+    ======
+    filename
+        The filename to save the image to. Image will be greyscale.
+    binArr
+        A 1d array containing the information about each pixel. Each 8 bits in the array contain
+        the greyscale infromation of a single pixel.
+    dim
+        The dimensions of final saved image.
     """
 
     # Check that the input binary array is 1D

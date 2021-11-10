@@ -10,16 +10,14 @@ from CAencrypt.rand import *
 from CAencrypt.enc  import *
 
         
-S = 2
+S = 5
 
 K = 7
 
 NS = 3574541233091423
 
 # Import an image (black and white) and make binary black and white
-A = np.asarray(Image.open("circles.png"))
-A = np.array(A/255,dtype=int)
-Ashape = A.shape
+A, d = readBWImage2BinArr("circles.png")
 
 C = CA(k=K)
 
@@ -34,23 +32,19 @@ print("random seed:",C.randSeed)
 
 print("number of rules:",len(C.rules))
 print("Z_right:",C.Zright)
-
-def saveImage(fname,D1arr,outShape):
-    im = Image.fromarray(np.array(np.resize(D1arr,outShape)*255,dtype=np.uint8))
-    im.save(fname)
             
 # Set initial `end point'
 C.setBinEndVec(A.flatten())
 
 # save end point
-saveImage("input.png",C.end,Ashape)
+saveBinArr2BWImage("input.png",C.end,d)
 
 # And XOR this end point with a random array
 C.XORendArr()
 C.CAts = C.end
 
 # save end point
-saveImage("input_XORed.png",C.end,Ashape)
+saveBinArr2BWImage("input_xored.png",C.end,d)
 
 print("Input length:", len(C.end))
 print("\nEND   ",C.end)
@@ -60,7 +54,7 @@ print("")
 for i in range(S):
     t = time.time()
     C.singleCAstepReverseL()
-    saveImage("enc"+str(i)+".png",C.CAts,Ashape)
+    saveBinArr2BWImage("enc"+str(i)+".png",C.CAts,d)
     print(i,C.CAts, time.time()-t)
     
 print("\n\n")
@@ -72,19 +66,17 @@ C.saveRules()
 # Step forwards to decrypt
 D.readRules()
 D.setBinStartVec(C.CAts)
+t = time.time()
 D.CAsteps()
 
 # And XOR with the same random array as the input was XORed with
 D.setNoiseSeed(NS)
 D.XORendArr()
 
-saveImage("output.png",D.end,Ashape)
 
-print("\nEND   ",D.end)
+saveBinArr2BWImage("output.png",D.end,d)
 
-# # Xor for the final result
-# D.CAts = xorArrays(D.CAts,randArr)
-# saveImage("output.png",D.CAts,Ashape)
+print("\nEND   ",D.end, time.time()-t)
 
 for i in range(len(A)):
     if A.flatten()[i] != D.end[i]:

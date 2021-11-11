@@ -43,12 +43,12 @@ Let `k=3` and `N=5`. Also let the array of cells at time `j` be given by
 Then we guess our first two bits (labelled `G_N` and `G_1`) to be `0` and `1` where we wish to calculate the bit labelled `C_2`:
 ```
  G_N=0 | G_1=1 | C_2 |
-       | 1     | 0   | 0 | 1 | 1 |
+       | 1     | 0   | 0   | 1   | 1   |
 ```
 As the pairs of rules for `010` and `011` are distinct (i.e. one leads to a `1` and the other a `0`) we can find `C_2` from the two guessed values and the result at time `j` in index `1` of `1`. We then know the two `G` values and `C_2`, where we use `G_1` and `C_2` and the result of `0` at time `j` to find `C_3`
 ```
  G_N=0 | G_1=1 | C_2 | C_3 |
-       | 1     | 0   | 0   | 1 | 1 |
+       | 1     | 0   | 0   | 1   | 1   |
 ```
 We continue in this way to find all `C` values:
 ```

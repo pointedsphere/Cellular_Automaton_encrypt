@@ -1,5 +1,7 @@
 class randEQaDG:
     """
+    Stands for 'rand Even Quicker and Dirtier Generator'
+
     Generate a pseudo random number based on the `Even Quicker and Dirtier Generator' 
     random number generation in [1, p275-276].
 

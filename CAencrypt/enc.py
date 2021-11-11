@@ -171,7 +171,7 @@ class CA:
 
     def calcZright(self):
         """
-        Calculate the Zright value from a full CA rule set.
+        Calculate Zright value from a full CA rule set.
         """
 
         if self.rules is None:
@@ -245,7 +245,10 @@ class CA:
 
     def CAsteps(self,numSteps=None):
         """
-        Run the CA for a set number of timesteps and set the result as the final timestep
+        Run the CA for a set number of timesteps and set the result as the final timestep.
+
+        This starts from the array self.start, using the array self.CAts as a work array saving
+        the result of the steps forwards as self.end.
         """
 
         # Error checks
@@ -358,11 +361,11 @@ class CA:
 
     def CAstepsReverse(self,numSteps=None):
         """
-        Run the CA backwardsfor a set number of timesteps and set the result as the final timestep.
+        Run the CA backwards a set number of timesteps from the array self.end and then set the
+        resultant array to self.start.
 
         The initial cell array to move backwards from is self.end, with self.CAts used as a work
         array, eventually overwriting self.start with self.end evolved backwards by numSteps time steps.
-
         """
 
         # Error checks
@@ -494,7 +497,8 @@ class CA:
 
     def XORstartArr(self):
         """
-        XOR the start array with the current random seed for noise array
+        XOR the start array with a pseudo random array generated with the noise random seed
+        and the 'Even Quicker and Dirtier Generator'
         """
 
         if self.start is None:
@@ -516,7 +520,8 @@ class CA:
         
     def XORendArr(self):
         """
-        XOR the start array with the current random seed for noise array
+        XOR the end array with a pseudo random array generated with the noise random seed
+        and the 'Even Quicker and Dirtier Generator'
         """
 
         if self.end is None:

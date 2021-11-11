@@ -68,6 +68,62 @@ def xorArrays(A1,A2):
     return np.array(XORed,dtype=int)
 
 
+def binaryShannonEntroypy(binArr):
+    """
+    Calcualte the binary Shannon entropy (S) from an array of binary values in {0,1}.
+    Also calcualte the metric entropy (M in [0,1]), which is the Shannon entropy divided by 
+    the length of the array.
+
+    We want, for a completely random array, the metric entropy to be as close to 1 as possible.
+
+    Shannon entropy is calculated with:
+    
+        $$$   S = - \sum_{i=0}^{1} p(i)log_{2}(p(i))   $$$
+
+    where 2 is the total number of possible values an element of the input array can have,
+    p(i) is the number of values i in the array divided by the length of the array.
+
+    e.g. Let us calcualte the Shannon entropy for the binary array 11001111, we do this with
+
+        S = - ( (0.25 log_2 (0.25)) + (0.75 log_2 (0.75)) )
+          = - ( (-0.5) + (-0.311278...) )
+          = 0.811278...
+    
+    and the metric entropy is M=0.101410...
+    
+    INPUTS
+    ======
+    binArr
+        An array of binary values in {0,1}.
+
+    RETURNS
+    =======
+    Shannon entropy
+        The calcualted Shannon entropy of the current array.
+    Metric entropy
+        The Shannon entroppy divided by the length of the input array.
+    """
+
+    # Convert the input array to a numpy array, just to make sure it's in that form
+    B = np.array(binArr,dtype=int)
+
+    # Check that the array only contains the values 0 and 1
+    if np.amax(B)>1 or np.amin(B)<0:
+        EXIT("binary Shannon entropy calcualtion can only take in array containing binary values")
+
+    # Then calculate the p(0) and p(1) values
+    p0 = np.count_nonzero(B==0) / len(B)
+    p1 = np.count_nonzero(B==1) / len(B)
+
+    # Then calculate the Shannon entropy
+    S = - ( (p0*np.log2(p0)) + (p1*np.log2(p1)) )
+
+    # And the metric entropy
+    M = S / len(B)
+
+    return S, M
+    
+
 def readBWImage2BinArr(filename):
     """
     Read a black and white image to a binary array.

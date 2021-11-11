@@ -96,7 +96,7 @@ def readBWImage2BinArr(filename):
     """
 
     if not os.path.exists(filename):
-        EXIT("File to read as binary array does not exist")
+        EXIT("File to read as binary array, "+filename+", does not exist")
 
     # Load the image in as an array
     I = Image.open(filename)

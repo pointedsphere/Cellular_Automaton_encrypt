@@ -267,7 +267,7 @@ class CA:
         self.CAts = np.array(tmpArr)
 
 
-    def CAsteps(self,numSteps=None):
+    def CAsteps(self,numSteps=None,verbose=False):
         """
         Run the CA for a set number of timesteps and set the result as the final timestep.
 
@@ -286,7 +286,11 @@ class CA:
             
         self.CAts = self.start
         for i in range(numSteps):
+            if verbose:
+                t = time.time()
             self.singleCAstep()
+            if verbose:
+                print("    + decryption step : "+str(i+1)," took : "+str('%.3f'%(time.time()-t))+" seconds")
         self.end = self.CAts
 
 
@@ -408,7 +412,7 @@ class CA:
                 t = time.time()
             self.singleCAstepReverseL()
             if verbose:
-                print("encryption step : "+str(i)," took : ",'%.6f'%(time.time()-t)," seconds")
+                print("    + encryption step : "+str(i+1)," took : "+str('%.3f'%(time.time()-t))+" seconds")
         self.start = self.CAts
 
         

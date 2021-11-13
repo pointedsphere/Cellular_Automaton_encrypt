@@ -55,7 +55,7 @@ We continue in this way to find all `C` values:
  G_N=0 | G_1=1 | C_2 | C_3 | C_4 | C_5 | C_6
        | 1     | 0   | 0   | 1   | 1   |
 ```
-Due to the periodicity of the array it must be the case that `G_N=C_5` and `G_1=C_6`. If this is the case then the previous step we have found is valid (though it is not necessarily the only valid 'backwards step').
+Due to the periodicity of the array it must be the case that `G_N=C_5` and `G_1=C_6`. If this is the case then the previous step we have found is valid (though it is not necessarily the only valid 'backwards step'). I.e. valid cells at time `j-1` are `|G_1|C_2|C_3|C_4|C_5|` and stepping forwards with the given ruleset will recover our initial array `|1|0|0|1|1|`.
 
 
 

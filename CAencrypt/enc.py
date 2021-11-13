@@ -1,5 +1,7 @@
 import random as r
 import numpy as np
+import time
+from os.path import exists
 
 from CAencrypt.util import *
 from CAencrypt.rand import *
@@ -58,13 +60,21 @@ class CA:
 
         # The number of steps to use for encryption/decryption
         self.numSteps = numSteps
+
+        if self.k is not None:
+            # The number of possible arrangements of k-1 bits
+            self.numkM1 = np.power(2,self.k-1)
+
+            # The number of possible arrangements of k bits
+            self.numk = self.numkM1 * 2
+        else:
+            # The number of possible arrangements of k-1 bits
+            self.numkM1 = None
+
+            # The number of possible arrangements of k bits
+            self.numk = None
+
             
-        # The number of possible arrangements of k-1 bits
-        self.numkM1 = np.power(2,self.k-1)
-
-        # The number of possible arrangements of k bits
-        self.numk = self.numkM1 * 2
-
         # Start vector with which to run a CA
         self.start = None
 
@@ -111,6 +121,12 @@ class CA:
 
         self.k = K
 
+        # The number of possible arrangements of k-1 bits
+        self.numkM1 = np.power(2,self.k-1)
+
+        # The number of possible arrangements of k bits
+        self.numk = self.numkM1 * 2
+        
 
     def setNumSteps(self,T):
         """
@@ -251,7 +267,7 @@ class CA:
         self.CAts = np.array(tmpArr)
 
 
-    def CAsteps(self,numSteps=None):
+    def CAsteps(self,numSteps=None,verbose=False):
         """
         Run the CA for a set number of timesteps and set the result as the final timestep.
 
@@ -270,7 +286,11 @@ class CA:
             
         self.CAts = self.start
         for i in range(numSteps):
+            if verbose:
+                t = time.time()
             self.singleCAstep()
+            if verbose:
+                print("    + decryption step : "+str(i+1)," took : "+str('%.3f'%(time.time()-t))+" seconds")
         self.end = self.CAts
 
 
@@ -367,7 +387,7 @@ class CA:
         EXIT("Cannot reverse CA step")
 
 
-    def CAstepsReverse(self,numSteps=None):
+    def CAstepsReverse(self,numSteps=None,verbose=False):
         """
         Run the CA backwards a set number of timesteps from the array self.end and then set the
         resultant array to self.start.
@@ -384,11 +404,15 @@ class CA:
 
         if numSteps is None:
             numSteps = self.numSteps
-            
+
         # Need to initially set the CAts from the end point
         self.CAts = self.end
         for i in range(numSteps):
+            if verbose:
+                t = time.time()
             self.singleCAstepReverseL()
+            if verbose:
+                print("    + encryption step : "+str(i+1)," took : "+str('%.3f'%(time.time()-t))+" seconds")
         self.start = self.CAts
 
         
@@ -427,6 +451,10 @@ class CA:
         if np.amin(endVec)<0:
             EXIT("Ending vector should be binary, contains values < 0.")
 
+        # Check that the k value has been set
+        if self.k is None:
+            EXIT("k has not been set before calling setBinEndVec")
+            
         # Check that the vector space is sufficiently large
         if len(endVec)<self.k:
             EXIT("Vector size must be at least that of neighbourhood size.")
@@ -452,8 +480,6 @@ class CA:
             EXIT("k not set, so nothing to save")
         if self.numSteps is None:
             EXIT("Number of steps not set, so nothing to save")
-        if self.noiseSeed is None:
-            EXIT("Noise seed not set, so nothing to save")
 
         outputArr = []
         for b in range(0,self.numkM1):
@@ -465,8 +491,7 @@ class CA:
                 outputArr.append(0)
 
         # Save the data out
-        keyHead = "k ::: " + str(self.k) + "\nT ::: " + str(self.numSteps) \
-            + "\nS ::: " + str(self.noiseSeed) + "\nR :::"
+        keyHead = "k ::: " + str(self.k) + "\nT ::: " + str(self.numSteps) + "\nR :::"
         np.savetxt(filename, np.array(outputArr,dtype=int), newline=" ", fmt="%s", header=keyHead)
         
 
@@ -476,11 +501,14 @@ class CA:
         0 then the output for appending 1.
         """
 
+        # Make sure the keyfile exists
+        if not exists(filename):
+            EXIT("Keyfile '"+filename+"' does not exist")
+            
         # Read the data in from the output file
         with open(filename,"r") as f:
             self.k         = int(f.readline().split(" ")[-1])
             self.numSteps  = int(f.readline().split(" ")[-1])
-            self.noiseSeed = int(f.readline().split(" ")[-1])
             inputArr       = np.array(f.readline().split(" ")[3:])
 
         # Set all the values related to k

@@ -5,7 +5,6 @@ from CAencrypt.util import *
 from CAencrypt.rand import *
 
 class CA:
-
     """
     A class for generating and running (both forwards and backwards) reversible cellular automata (CA).
 
@@ -137,7 +136,16 @@ class CA:
             EXIT("input S for noiseSeed is not an integer.")
         
         self.noiseSeed = S % 0b100000000000000000000000000000000
-            
+
+
+    def setRandNoiseSeed(self):
+        """
+        Set the noise seed to a random value.
+        """
+
+        self.setNoiseSeed(r.randint\
+                          (0b010000000000000000000000000000000,0b100000000000000000000000000000000))
+
         
     def genRulesLeft(self):
         """
@@ -432,7 +440,7 @@ class CA:
         self.CAS  = len(self.end)
 
 
-    def saveRules(self,filename="key.shared"):
+    def saveKey(self,filename="key.shared"):
         """
         Save the ruleset by iterating through each pair of integers in [0,k-1] saving output for appending
         0 then the output for appending 1.
@@ -444,7 +452,9 @@ class CA:
             EXIT("k not set, so nothing to save")
         if self.numSteps is None:
             EXIT("Number of steps not set, so nothing to save")
-            
+        if self.noiseSeed is None:
+            EXIT("Noise seed not set, so nothing to save")
+
         outputArr = []
         for b in range(0,self.numkM1):
             if self.rules[padLeftZeros("{0:b}".format(b),self.k-1)+"0"] == 0:
@@ -455,11 +465,12 @@ class CA:
                 outputArr.append(0)
 
         # Save the data out
-        keyHead = "k ::: " + str(self.k) + "\nT ::: " + str(self.numSteps) + "\nR :::"
+        keyHead = "k ::: " + str(self.k) + "\nT ::: " + str(self.numSteps) \
+            + "\nS ::: " + str(self.noiseSeed) + "\nR :::"
         np.savetxt(filename, np.array(outputArr,dtype=int), newline=" ", fmt="%s", header=keyHead)
         
 
-    def readRules(self,filename="key.shared"):
+    def readKey(self,filename="key.shared"):
         """
         Read the ruleset by iterating through each pair of integers in [0,k-1] saving output for appending
         0 then the output for appending 1.
@@ -467,9 +478,10 @@ class CA:
 
         # Read the data in from the output file
         with open(filename,"r") as f:
-            self.k        = int(f.readline().split(" ")[-1])
-            self.numSteps = int(f.readline().split(" ")[-1])
-            inputArr      = np.array(f.readline().split(" ")[3:])
+            self.k         = int(f.readline().split(" ")[-1])
+            self.numSteps  = int(f.readline().split(" ")[-1])
+            self.noiseSeed = int(f.readline().split(" ")[-1])
+            inputArr       = np.array(f.readline().split(" ")[3:])
 
         # Set all the values related to k
         self.numkM1 = np.power(2,self.k-1)

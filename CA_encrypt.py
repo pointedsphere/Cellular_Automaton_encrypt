@@ -62,6 +62,10 @@ parser.add_argument("-V","--verbose",action="store_true",\
 parser.add_argument("-B","--BW",default="img.png",type=str,\
                     help="Use an input image from the given input file, default 'img.png'.")
 
+# Output file
+parser.add_argument("-O","--output-file",default="DEFAULT",type=str,\
+                    help="output filename, default either encrypted.png or decrypted.png.")
+
 # Options to encrypt or decrypt
 parser.add_argument("-E","--Enc",action="store_true",\
                     help="Encrypt the given input file.")
@@ -127,11 +131,7 @@ if __name__ == "__main__":
         else:
             EXIT("Noise seed cannot be 0")
         
-        # Initial error checks
-        if not args.BW:
-            EXIT("No valid input flag given.")
-
-        elif args.BW:
+        if args.BW:
 
             if args.verbose:
                 print("Attempting to encrypt the greyscale image "+args.BW)
@@ -147,32 +147,106 @@ if __name__ == "__main__":
             if args.verbose:
                 print("Loaded image "+args.BW)
 
+            # XOR final encrypted image with noise
             C.XORendArr()
                 
             if args.verbose:
                 print("XORed input array with random noise generated with seed "+str(C.noiseSeed))
-                print("Attempting "+str(args.T)+" encryption steps with k="+str(args.K))
+                print("Attempting "+str(C.numSteps)+" encryption steps with k="+str(C.k))
                 
             # Perform the encryption steps
             if args.verbose:
-                C.CAstepsReverse(numSteps=args.T,verbose=True)
+                C.CAstepsReverse(numSteps=C.numSteps,verbose=True)
             else:
-                C.CAstepsReverse(numSteps=args.T,verbose=False)
+                C.CAstepsReverse(numSteps=C.numSteps,verbose=False)
 
             if args.verbose:
-                print("Encryption successful, saving output as output.png")
+                print("Encryption successful, saving output as encrypted.png")
             
             # Then save the output image
-            saveBinArr2BWImage("output.png",C.start,d)
+            if args.output_file == "DEFAULT":
+                outfile = "encrypted.png"
+            else:
+                outfile = args.output_file
+            saveBinArr2BWImage(outfile,C.start,d)
 
             # And print info about the output image/encryption
             if args.verbose:
-                print("Save successful")
-                print("Image/encryption properties")
-            print("output file dimensions "+str(d))
-            print("random noise seed "+str(C.noiseSeed))
+                print("Save of encrypted image to '"+outfile+"' successful")
+                print("Image/encryption properties:")
+            print("    = random noise seed "+str(C.noiseSeed))
+
+        else:
+
+            EXIT("No valid encryption flag/file given")
 
 
+    elif args.Dec:
+
+        # Decrypt a given input file
+        
+        # Start by initialising a CA
+        C = CA()
+
+        # Read the input file
+        C.readKey(args.keyFile_name)
+
+        # Set or generate the noise seed
+        if args.N>0:
+            C.setNoiseSeed(args.N)
+        elif args.N<0:
+            EXIT("Noise seed must be set for decryption")
+        else:
+            EXIT("Noise seed cannot be 0")
+            
+        if args.BW:
+
+            if args.verbose:
+                print("Attempting to decrypt the greyscale image "+args.BW)
+            
+            # Encrypt a black and white image
+            if not exists(args.BW):
+                EXIT("Input black and white image '"+args.BW+"' does not exist.")
+
+            # Read the input image and its dimensions and set the array in the CA class
+            I, d = readBWImage2BinArr(args.BW)
+            C.setBinStartVec(I.flatten())
+            
+            if args.verbose:
+                print("Loaded image "+args.BW)
+                
+            if args.verbose:
+                print("Attempting "+str(C.numSteps)+" decryption steps with k="+str(C.k))
+                
+            # Perform the encryption steps
+            if args.verbose:
+                C.CAsteps(numSteps=C.numSteps,verbose=True)
+            else:
+                C.CAsteps(numSteps=C.numSteps,verbose=False)
+
+            # Then XOR the final step with the random noise
+            C.XORendArr()
+                
+            if args.verbose:
+                print("XORed final step with random noise generated with seed "+str(C.noiseSeed))
+                print("Decryption successful, saving output as decrypted.png")
+            
+            # Then save the output image
+            if args.output_file == "DEFAULT":
+                outfile = "decrypted.png"
+            else:
+                outfile = args.output_file
+            saveBinArr2BWImage(outfile,C.end,d)
+
+            # And print info about the output image/encryption
+            if args.verbose:
+                print("Save of decrypted image to '"+outfile+"' successful")
+
+        else:
+
+            EXIT("No valid encryption flag/file given")
+
+            
     else:
 
         print("A flag wasnt given that leads to any action, use one of:")

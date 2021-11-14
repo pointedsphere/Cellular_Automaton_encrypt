@@ -156,13 +156,13 @@ It is not (yet) known if this is a possible attack (the next step is to examine 
 
 ## References
 
-[^1]:Wuensche A. Encryption using cellular automata chain-rules. In: Adamatzky AR, Alonso-Sanz RA, editors. Automata [Internet]. Luniver Press; 2008. p. 126--138. Available from: https://users.sussex.ac.uk/~andywu/downloads/papers/2008_encryption.pdf
+[^1]:Wuensche A. Encryption using cellular automata chain-rules. In: Adamatzky AR, Alonso-Sanz RA, editors. Automata. Luniver Press; 2008. p. 126--138.
 
 [^2]:Wolfram S. Statistical mechanics of cellular automata. Rev Mod Phys. 1983;55(3):601–44. 
 
-[^3]:1. Wuensche A, Lesser M. The Global Dynamics of Cellular Automata [Internet]. 1st ed. Reading, Massachusetts, USA: Addison Wesley Publishing Company; 1992. Available from: https://users.sussex.ac.uk/~andywu/gdca.html
+[^3]:Wuensche A, Lesser M. The Global Dynamics of Cellular Automata. 1st ed. Reading, Massachusetts, USA: Addison Wesley Publishing Company; 1992.
 
-[^4]:Dascălu M. Cellular Automata and Randomization: A Structural Overview. In: López-Ruiz R, editor. From Natural to Artificial Intelligence - Algorithms and Applications [Internet]. Rijeka: IntechOpen; 2018. p. 165–83. Available from: https://www.intechopen.com/chapters/62760
+[^4]:Dascălu M. Cellular Automata and Randomization: A Structural Overview. In: López-Ruiz R, editor. From Natural to Artificial Intelligence - Algorithms and Applications. Rijeka: IntechOpen; 2018. p. 165–83.
 
 [^5]:``Numerical Recipes in Fortran 77, The Art of Scientific Computing, Vol 1'', Press W.H. and Teukolsky S.A. and Vetterling W.T. and Flannery B.P., 2nd ed, Cambridge University Press.
 

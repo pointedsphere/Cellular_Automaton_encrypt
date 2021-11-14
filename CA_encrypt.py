@@ -62,9 +62,11 @@ parser.add_argument("-V","--verbose",action="store_true",\
 parser.add_argument("-B","--BW",default="img.png",type=str,\
                     help="Use an input image from the given input file, default 'img.png'.")
 
-# Output file
+# Output file(s)
 parser.add_argument("-O","--output-file",default="DEFAULT",type=str,\
                     help="output filename, default either encrypted.png or decrypted.png.")
+parser.add_argument("-S","--verbose-save",action="store_true",\
+                    help="Save after every encryption/decryption step.")
 
 # Options to encrypt or decrypt
 parser.add_argument("-E","--Enc",action="store_true",\
@@ -153,12 +155,29 @@ if __name__ == "__main__":
             if args.verbose:
                 print("XORed input array with random noise generated with seed "+str(C.noiseSeed))
                 print("Attempting "+str(C.numSteps)+" encryption steps with k="+str(C.k))
+                if args.verbose_save:
+                    print("Also saving output image after each encryption step")
                 
             # Perform the encryption steps
-            if args.verbose:
-                C.CAstepsReverse(numSteps=C.numSteps,verbose=True)
+            if args.verbose_save:
+                # Save after every encryption step
+                C.CAts = C.end # Needed as single step only works with the work array C.CAts
+                for i in range(C.numSteps):
+                    if args.verbose:
+                        t = time.time()
+                    C.singleCAstepReverseL()
+                    saveBinArr2BWImage("enc"+str(i+1)+".png",C.CAts,d)
+                    if args.verbose:
+                        print("    + encryption step : "+str(i+1),\
+                              " took : "+str('%.3f'%(time.time()-t))+" seconds")
+                # Needed as single step only works with the work array C.CAts
+                C.start = C.CAts
             else:
-                C.CAstepsReverse(numSteps=C.numSteps,verbose=False)
+                # Do not save after every encryption step
+                if args.verbose:
+                    C.CAstepsReverse(numSteps=C.numSteps,verbose=True)
+                else:
+                    C.CAstepsReverse(numSteps=C.numSteps,verbose=False)
 
             if args.verbose:
                 print("Encryption successful, saving output as encrypted.png")
@@ -203,6 +222,9 @@ if __name__ == "__main__":
 
             if args.verbose:
                 print("Attempting to decrypt the greyscale image "+args.BW)
+                if args.verbose_save:
+                    print("Also saving output image after each encryption step")
+                    print("Note: final decoding step is saved before XORing")
             
             # Encrypt a black and white image
             if not exists(args.BW):
@@ -219,6 +241,18 @@ if __name__ == "__main__":
                 print("Attempting "+str(C.numSteps)+" decryption steps with k="+str(C.k))
                 
             # Perform the encryption steps
+            if args.verbose_save:
+                # Save after every encryption step
+                C.CAts = C.start # Needed as single step only works with the work array C.CAts
+                for i in range(C.numSteps):
+                    if args.verbose:
+                        t = time.time()
+                    C.singleCAstep()
+                    saveBinArr2BWImage("dec"+str(i+1)+".png",C.CAts,d)
+                    if args.verbose:
+                        print("    + decryption step : "+str(i+1),\
+                              " took : "+str('%.3f'%(time.time()-t))+" seconds")
+                C.end = C.CAts # Needed as single step only works with the work array C.CAts
             if args.verbose:
                 C.CAsteps(numSteps=C.numSteps,verbose=True)
             else:

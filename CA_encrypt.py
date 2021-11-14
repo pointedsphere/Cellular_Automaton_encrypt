@@ -1,7 +1,3 @@
-import random as r
-import sys
-import numpy as np
-
 from PIL import Image
 import time
 

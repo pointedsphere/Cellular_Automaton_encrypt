@@ -1,6 +1,3 @@
-from PIL import Image
-import time
-
 from CAencrypt.util import *
 from CAencrypt.rand import *
 from CAencrypt.enc  import *
@@ -9,7 +6,7 @@ import argparse
 from argparse import RawTextHelpFormatter
 
 from os.path import exists
-
+import time
 
 prog_description = """
 

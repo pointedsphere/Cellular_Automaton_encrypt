@@ -246,10 +246,11 @@ if __name__ == "__main__":
                         print("    + decryption step : "+str(i+1),\
                               " took : "+str('%.3f'%(time.time()-t))+" seconds")
                 C.end = C.CAts # Needed as single step only works with the work array C.CAts
-            if args.verbose:
-                C.CAsteps(numSteps=C.numSteps,verbose=True)
             else:
-                C.CAsteps(numSteps=C.numSteps,verbose=False)
+                if args.verbose:
+                    C.CAsteps(numSteps=C.numSteps,verbose=True)
+                else:
+                    C.CAsteps(numSteps=C.numSteps,verbose=False)
 
             # Then XOR the final step with the random noise
             C.XORendArr()

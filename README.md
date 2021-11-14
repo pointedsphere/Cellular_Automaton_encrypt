@@ -148,7 +148,9 @@ At first glance the example of XORing before encryption given above may seem to 
 
 However, we have a problem. If Eve knows that the start of the image is a string of repeated bits then she knows the bits Alice used as the basis for her encryption (as the noise seed is public). Eve then knows the bits that one finds taking some number of steps back (recall `T` is private). It is plausible that there exists some way that Eve could use this to narrow her search for the valid CA ruleset that is the backbone of the key.
 
-It is not (yet) known if this is possible (the next step is to examine this). It is of particular interest as the reuse of a key with a different noise seed would give Eve even more information if she again knew of part of the message with a repeated bit string. As the initial bits would again be known by Eve and they are different every time, Eve could build up quite a library of start and end bit strings. It is possible this could greatly reduce Eve's brute force attack costs.
+This is of particular interest as the reuse of a key with a different noise seed would give Eve even more information (if she again knew of part of the message with a repeated bit string). The initial bits would again be known by Eve and they are different every time. As such over many intercepted messages Eve could build up quite a library of start and end bit strings. It is possible this could greatly reduce Eve's brute force attack costs.
+
+It is not (yet) known if this is a possible attack (the next step is to examine this).
 
 
 

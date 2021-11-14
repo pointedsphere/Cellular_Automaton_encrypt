@@ -134,18 +134,21 @@ However, if we take the above XORed image as the starting point for `T` backward
 
 This, at the moment, is a hypothetical way to make the CA encryption method secure for all input data strings (or at least more secure). However, it require much more thorough investigation for us to be in any way confident about any possible increase in security this method may provide.
 
+### Example of XORing and then encrypting
 
+Alice starts with the image of the circles as above, aiming to encrypt with `k=7` and `T=5`. However, before she does this she generates some random noise with the 'Even Quicker and Dirtier Generator' [^5] and XORs the input with this random noise, whilst recording the seed (here 2818718933). She then encrypts this XORed image as previously to give the below
 
-## TODO/Notes
+![Example of circle XORed then encrypted](images/mult_enc_noise_greyscale.png)
 
-- Show what happens when we import the circles input as a proper greyscale image (with 8 bits per pixel).
-- Then show what happens when we encrypt the clown image in much the same way, much harder to see what's going on.
-- Examine the cryptosystem which starts with the XOR
-  - Note the extra XOR is so cheap may as well include it, right...?
-  - Look at what information about the image can be brought back from XORing with the random array at any point.
-- Examine the entropy of bit strings using Shannon entropy http://www.shannonentropy.netmark.pl we want a 1!
-- Add more comments to things.
-- Note all spaces exist in the possible spaces, so if the number of possible rulesets is high enough Eve will likely find something that is a possible valid method before she finds our message.
+She can then send the final (rightmost) of these images to Bob for decryption along with the noise seed. Though Bob will have to perform the extra step of XORing the result of the `T=5`th and final forwards CA step with the same noise that Alice used, generated using the same RNG and the known random seed.
+
+### Possible Attacks/Vulnerabilities
+
+At first glance the example of XORing before encryption given above may seem to be a solution to our earlier problem where the data in images with a lot of repeated bits was not adequately obfuscated by the CA encryption steps.
+
+However, we have a problem. If Eve knows that the start of the image is a string of repeated bits then she knows the bits Alice used as the basis for her encryption (as the noise seed is public). Eve then knows the bits that one finds taking some number of steps back (recall `T` is private). It is plausible that there exists some way that Eve could use this to narrow her search for the valid CA ruleset that is the backbone of the key.
+
+It is not (yet) known if this is possible (the next step is to examine this). It is of particular interest as the reuse of a key with a different noise seed would give Eve even more information if she again knew of part of the message with a repeated bit string. As the initial bits would again be known by Eve and they are different every time, Eve could build up quite a library of start and end bit strings. It is possible this could greatly reduce Eve's brute force attack costs.
 
 
 

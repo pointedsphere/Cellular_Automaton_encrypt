@@ -14,6 +14,8 @@ class CA:
     We then update the cell at time t_i+1 from the neighbourhood at time t_i, centered on the cell
     in question.
 
+    This is carried out following [1,2]
+
     NOTABLE VARIABLES
     =================
 
@@ -32,6 +34,12 @@ class CA:
     CAts:
         The working array of CA cells.
 
+    REFERENCES
+    ==========
+    [1] Wuensche A. Encryption using cellular automata chain-rules. 
+        In: Automata. Luniver Press; 2008. p. 126--138.
+    [2] Wuensche A, Lesser M. The Global Dynamics of Cellular Automata. 
+        1st ed. Reading, Massachusetts, USA: Addison Wesley Publishing Company; 1992.
     """
 
     
@@ -165,10 +173,15 @@ class CA:
         
     def genRulesLeft(self):
         """
-        Generate a dictionary of rules such that Z_left = 1,
+        Generate a dictionary of rules such that Z_left = 1 following [1]
 
         i.e. a rule that we can reverse by moving from left to right where all pairs of
         k-1 leftmost bits result in distinct outputs.
+
+        REFERENCES
+        ==========
+        [1] Wuensche A. Encryption using cellular automata chain-rules. 
+            In: Automata. Luniver Press; 2008. p. 126--138.
         """
 
         # Initialise rules dictionary
@@ -296,7 +309,8 @@ class CA:
 
     def singleCAstepReverseL(self):
         """
-        Perform a step backwards in the CA using the current rules assuming Z_left=1.
+        Perform a step backwards in the CA using the current rules assuming Z_left=1 following [1,2]
+
         
         I.e. take a single CA step taking self.CAts as the state at timestep t_{i} and then
         overwriting it with the state at time t_{i-1}
@@ -339,6 +353,13 @@ class CA:
         We then compare the two guess values G with the two values C for N-1 and N. They
         should match if we have done everything correctly. If not, start again with a 
         different guess.
+
+        REFERENCES
+        ==========
+        [1] Wuensche A. Encryption using cellular automata chain-rules. 
+            In: Automata. Luniver Press; 2008. p. 126--138.
+        [2] Wuensche A, Lesser M. The Global Dynamics of Cellular Automata. 
+            1st ed. Reading, Massachusetts, USA: Addison Wesley Publishing Company; 1992.
         """
         
         # Try for all the possible combinations of the first k-1 bits

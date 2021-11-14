@@ -20,7 +20,7 @@ Based on work by Wuensche and Lesser [1,2].
 prog_epilog="""
 
 References:
-[1] Wuensche A. Encryption using cellular automata chain-rules. In: Adamatzky AR, Alonso-Sanz RA. Luniver Press; 2008. p. 126--138.
+[1] Wuensche A. Encryption using cellular automata chain-rules. In: Automata. Luniver Press; 2008. p. 126--138.
 [2] Wuensche A, Lesser M. The Global Dynamics of Cellular Automata. 1st ed. Reading, Massachusetts, USA: Addison Wesley Publishing Company; 1992.
 
 """

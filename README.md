@@ -156,7 +156,7 @@ It is not (yet) known if this is a possible attack (the next step is to examine 
 
 ## References
 
-[^1]:Wuensche A. Encryption using cellular automata chain-rules. In: Adamatzky AR, Alonso-Sanz RA, editors. Automata. Luniver Press; 2008. p. 126--138.
+[^1]:Wuensche A. Encryption using cellular automata chain-rules. In: Automata. Luniver Press; 2008. p. 126--138.
 
 [^2]:Wolfram S. Statistical mechanics of cellular automata. Rev Mod Phys. 1983;55(3):601–44. 
 

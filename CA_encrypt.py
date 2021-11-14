@@ -1,6 +1,3 @@
-from PIL import Image
-import time
-
 from CAencrypt.util import *
 from CAencrypt.rand import *
 from CAencrypt.enc  import *
@@ -9,7 +6,7 @@ import argparse
 from argparse import RawTextHelpFormatter
 
 from os.path import exists
-
+import time
 
 prog_description = """
 
@@ -249,10 +246,11 @@ if __name__ == "__main__":
                         print("    + decryption step : "+str(i+1),\
                               " took : "+str('%.3f'%(time.time()-t))+" seconds")
                 C.end = C.CAts # Needed as single step only works with the work array C.CAts
-            if args.verbose:
-                C.CAsteps(numSteps=C.numSteps,verbose=True)
             else:
-                C.CAsteps(numSteps=C.numSteps,verbose=False)
+                if args.verbose:
+                    C.CAsteps(numSteps=C.numSteps,verbose=True)
+                else:
+                    C.CAsteps(numSteps=C.numSteps,verbose=False)
 
             # Then XOR the final step with the random noise
             C.XORendArr()
@@ -282,83 +280,4 @@ if __name__ == "__main__":
         print("A flag wasnt given that leads to any action, use one of:")
         print("    -G :: Generate a shared key file")
                 
-
-# S = 5
-
-# K = 7
-
-# NS = 3574541233091423
-
-# # Import an image (black and white) and make binary black and white
-# A, d = readBWImage2BinArr("circles.png")
-
-# C = CA(k=K)
-
-# R = r.randint(1,1000000)
-# C.randSeed = R
-# C.setRandSeed()
-# C.setNoiseSeed(NS)
-# C.setNumSteps(S)
-# C.genRulesLeftReversible()
-
-# print("random seed:",C.randSeed)
-
-# print("number of rules:",len(C.rules))
-# print("Z_right:",C.Zright)
-            
-# # Set initial `end point'
-# C.setBinEndVec(A.flatten())
-
-# ES,EM = binaryShannonEntroypy(C.end)
-# print("Input entropy: ",ES,EM)
-
-# # save end point
-# saveBinArr2BWImage("input.png",C.end,d)
-
-# # And XOR this end point with a random array
-# C.XORendArr()
-# C.CAts = C.end
-
-# # save end point
-# saveBinArr2BWImage("input_xored.png",C.end,d)
-# ES,EM = binaryShannonEntroypy(C.end)
-
-# print("Input length:", len(C.end))
-# print("\nEND   ",C.end,ES,EM)
-# print("")
-
-# # Step backwards from end to encrypt saving each image
-# for i in range(S):
-#     t = time.time()
-#     C.singleCAstepReverseL()
-#     saveBinArr2BWImage("enc"+str(i)+".png",C.CAts,d)
-#     ES,EM = binaryShannonEntroypy(C.CAts)
-#     print(i,C.CAts,ES,EM,time.time()-t)
-    
-# print("\n\n")
-
-# # Now create a new class instance
-# D = CA(k=K)
-# C.saveKey()
-
-# # Step forwards to decrypt
-# D.readKey()
-# D.setBinStartVec(C.CAts)
-# t = time.time()
-# D.CAsteps()
-
-# # And XOR with the same random array as the input was XORed with
-# D.setNoiseSeed(NS)
-# D.XORendArr()
-
-
-# saveBinArr2BWImage("output.png",D.end,d)
-
-# print("\nEND   ",D.end, time.time()-t)
-
-# # for i in range(len(A)):
-# #     if A.flatten()[i] != D.end[i]:
-# #         EXIT("Beginning and end do not match")
-# # print("Beginning and end match")
-
 
